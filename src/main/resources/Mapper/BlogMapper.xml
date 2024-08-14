@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.crabdp.mapper.BlogMapper">
+
+
+    <update id="incrementLikeCount">
+        update tb_blog_comments
+        set liked = tb_blog_comments.liked + 1
+        where id = #{id}
+    </update>
+    <update id="decrementLikeCount">
+        update tb_blog_comments
+        set liked = tb_blog_comments.liked - 1
+        where id = #{id}
+    </update>
+    <select id="pageQuery" resultType="com.crabdp.entity.Blog">
+        select * from tb_blog
+        <where>
+            <if test="id != null">
+                and id = #{id}
+            </if>
+        </where>
+    </select>
+    <select id="queryHotBlog" resultType="com.crabdp.entity.Blog">
+        select * from tb_blog
+        order by liked desc
+
+
+    </select>
+</mapper>

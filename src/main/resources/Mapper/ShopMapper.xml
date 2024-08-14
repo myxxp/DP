@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.crabdp.mapper.ShopMapper">
+
+    <insert id="saveShop">
+        INSERT INTO tb_shop (name, type_id, images, area, address, x, y, avg_price, sold, comments, score, open_hours, create_time, update_time)
+        VALUES ( #{name}, #{typeId}, #{images}, #{area}, #{address}, #{x}, #{y}, #{avgPrice}, #{sold}, #{comments}, #{score}, #{openHours}, #{createTime}, #{updateTime})
+    </insert>
+    <update id="update">
+        UPDATE tb_shop
+        <set>
+            <if test="name != null">
+                name = #{name},
+            </if>
+            <if test="typeId != null">
+                type_id = #{typeId},
+            </if>
+            <if test="images != null">
+                images = #{images},
+            </if>
+            <if test="area != null">
+                area = #{area},
+            </if>
+            <if test="address != null">
+                address = #{address},
+            </if>
+            <if test="x != null">
+                x = #{x},
+            </if>
+            <if test="y != null">
+                y = #{y},
+            </if>
+            <if test="avgPrice != null">
+                avg_price = #{avgPrice},
+            </if>
+            <if test="sold != null">
+                sold = #{sold},
+            </if>
+            <if test="comments != null">
+                comments = #{comments},
+            </if>
+            <if test="score != null">
+                score = #{score},
+            </if>
+            <if test="openHours != null">
+                open_hours = #{openHours},
+            </if>
+            update_time = #{updateTime}
+        </set>
+        WHERE id = #{id}
+    </update>
+    <select id="pageQueryByType" resultType="com.crabdp.entity.Shop">
+        SELECT * FROM tb_shop
+        <where>
+            <if test="typeId != null">
+                AND type_id = #{typeId}
+            </if>
+        </where>
+        ORDER BY create_time DESC
+    </select>
+    <select id="findByIds" parameterType="list" resultType="com.crabdp.entity.Shop">
+        SELECT * FROM tb_shop WHERE id IN
+        <foreach item="id" index="index" collection="list" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+        ORDER BY FIELD(id,
+        <foreach item="id" index="index" collection="list" separator=",">
+            #{id}
+        </foreach>)
+    </select>
+    <select id="queryByName" resultType="com.crabdp.entity.Shop">
+        SELECT * FROM tb_shop
+        <where>
+            <if test="name != null and name != ''">
+                AND name LIKE CONCAT('%', #{name}, '%')
+            </if>
+        </where>
+        ORDER BY create_time DESC
+    </select>
+    <select id="queryByTypeAndLocation" resultType="com.crabdp.entity.Shop">
+        SELECT * FROM tb_shop
+        <where>
+            <if test="typeId != null">
+                AND type_id = #{typeId}
+            </if>
+<!--            <if test="x != null">-->
+<!--                AND x = #{x}-->
+<!--            </if>-->
+<!--            <if test="y != null">-->
+<!--                AND y = #{y}-->
+<!--            </if>-->
+        </where>
+        ORDER BY create_time DESC
+    </select>
+
+</mapper>
