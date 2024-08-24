@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.crabdp.mapper.VoucherMapper">
+
+
+    <insert id="saveVoucher" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO tb_voucher (shop_id, title, sub_title, rules, pay_value, actual_value
+            <if test="status !=null">
+                , status
+            </if>
+            <if test="type !=null">
+                , type
+            </if>
+            <if test="createTime !=null">
+                , create_time
+            </if>
+            <if test="updateTime !=null">
+                , update_time
+            </if>
+        )
+        VALUES ( #{shopId}, #{title}, #{subTitle}, #{rules}, #{payValue}, #{actualValue}
+            <if test="status !=null">
+                , #{status}
+            </if>
+            <if test="type !=null">
+                , #{type}
+            </if>
+            <if test="createTime !=null">
+                , #{createTime}
+            </if>
+            <if test="updateTime !=null">
+                , #{updateTime}
+            </if>
+        )
+    </insert>
+    <insert id="saveSeckillVoucher">
+        INSERT INTO tb_seckill_voucher (voucher_id, stock, begin_time,  end_time
+        <if test="updateTime !=null">
+            , update_time
+        </if>
+        <if test="createTime !=null">
+            , create_time
+        </if>
+        )
+        VALUES ( #{voucherId}, #{stock}, #{beginTime}, #{endTime}
+        <if test="updateTime !=null">
+            , #{updateTime}
+        </if>
+        <if test="createTime !=null">
+            , #{createTime}
+        </if>
+        )
+    </insert>
+    <update id="updateSeckillVoucher">
+        UPDATE tb_seckill_voucher
+        <set>
+            <if test="stock != null">
+                stock = #{stock},
+            </if>
+            <if test="beginTime != null">
+                begin_time = #{beginTime},
+            </if>
+            <if test="endTime != null">
+                end_time = #{endTime},
+            </if>
+            update_time = CURRENT_TIMESTAMP
+        </set>
+        WHERE voucher_id = #{voucherId}
+
+    </update>
+    <update id="decreaseStock">
+        UPDATE tb_seckill_voucher
+        SET stock = stock - 1
+        WHERE voucher_id = #{voucherId} AND stock > 0
+    </update>
+    <select id="queryVoucherOfShop" resultType="com.crabdp.entity.Voucher" parameterType="java.lang.Long">
+        SELECT
+            v.`id`, v.`shop_id`, v.`title`, v.`sub_title`, v.`rules`, v.`pay_value`,
+            v.`actual_value`, v.`type`, sv.`stock` , sv.begin_time , sv.end_time
+        FROM tb_voucher v
+                 LEFT JOIN  tb_seckill_voucher sv ON v.id = sv.voucher_id
+        WHERE v.shop_id = #{shopId} AND v.status = 1
+    </select>
+    <select id="querySeckillVoucher" resultType="com.crabdp.entity.SeckillVoucher">
+        SELECT
+             `voucher_id`, `stock`, `begin_time`, `end_time`
+        FROM tb_seckill_voucher
+        WHERE voucher_id = #{voucherId}
+    </select>
+</mapper>
