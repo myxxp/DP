@@ -4,6 +4,8 @@ import com.crabdp.entity.User;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Select;
 
+import java.util.List;
+
 @Mapper
 public interface UserMapper {
 
@@ -27,4 +29,6 @@ public interface UserMapper {
 
     @Select("select * from tb_user where id = #{userId}")
     User selectById(Long userId);
+
+    List<User> list();
 }

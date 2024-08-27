@@ -1,10 +1,11 @@
 package com.crabdp.service;
 
-import cn.hutool.system.UserInfo;
 import com.crabdp.dto.LoginFormDTO;
 import com.crabdp.dto.UserDTO;
+import com.crabdp.entity.User;
 
 import javax.servlet.http.HttpSession;
+import java.util.List;
 
 
 public interface UserService{
@@ -20,4 +21,6 @@ public interface UserService{
     void  sign();
 
     Integer  signCount();
+
+    List<User> list();
 }

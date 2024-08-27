@@ -4,7 +4,6 @@ import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.bean.copier.CopyOptions;
 import cn.hutool.core.lang.UUID;
 import cn.hutool.core.util.RandomUtil;
-import cn.hutool.system.UserInfo;
 import com.crabdp.config.ClientInputException;
 import com.crabdp.dto.LoginFormDTO;
 import com.crabdp.dto.UserDTO;
@@ -14,7 +13,6 @@ import com.crabdp.service.UserService;
 import com.crabdp.utils.RegexUtils;
 import com.crabdp.utils.UserHolder;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
@@ -23,6 +21,7 @@ import javax.servlet.http.HttpSession;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
@@ -154,6 +153,13 @@ public class UserServiceImpl implements UserService {
 
     public  Integer signCount() {
         return 0;
+    }
+
+    //查询所有用户
+    @Override
+    public List<User> list() {
+
+        return userMapper.list();
     }
 
 
