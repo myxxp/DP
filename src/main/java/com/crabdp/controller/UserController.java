@@ -1,17 +1,18 @@
 package com.crabdp.controller;
 
 
-import com.crabdp.dto.UserDTO;
-import com.crabdp.entity.UserInfo;
 import com.crabdp.common.Result;
 import com.crabdp.dto.LoginFormDTO;
-import com.crabdp.entity.User;
+import com.crabdp.dto.UserDTO;
+import com.crabdp.entity.UserInfo;
 import com.crabdp.service.UserInfoService;
 import com.crabdp.service.UserService;
 import com.crabdp.utils.UserHolder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 @RestController
@@ -120,16 +121,23 @@ public class UserController {
         return Result.ok();
     }
     /**
-     * 签到次数
-     * //TODO 未实现
+     * 签到次数统计
+     *
      * @return
      */
 
-    @GetMapping("/signCount")
+    @GetMapping("/sign/count")
     public Result<Integer> signCount(){
         Integer count = 0;
         count = userService.signCount();
         return Result.ok(count);
+    }
+
+    @PostMapping("/logout")
+    public Result logout(HttpServletRequest request, HttpServletResponse response) {
+        // 退出登录
+        userService.logout(request);
+        return Result.ok();
     }
 
 

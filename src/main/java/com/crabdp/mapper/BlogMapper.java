@@ -6,7 +6,7 @@ import com.github.pagehelper.Page;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Select;
 
-import javax.management.Query;
+import java.util.List;
 
 @Mapper
 public interface BlogMapper {
@@ -22,4 +22,10 @@ public interface BlogMapper {
 
     @Select("select * from tb_blog where id = #{id}")
     Blog selectById(Long id);
+
+    boolean saveBlog(Blog blog);
+
+    Page<Blog> queryBlogByUserId(Long id);
+
+    List<Blog> queryBlogByIds(List<Long> ids);
 }

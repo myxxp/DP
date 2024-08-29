@@ -25,5 +25,7 @@ public interface ShopMapper {
 
     Page<Shop> queryByName(String name);
 
-    Page<Shop> queryByTypeAndLocation(Long typeId, Double x, Double y);
+    List<Shop> queryByTypeAndLocation(List<Long> ids);
+
+    List<Shop> list();
 }

@@ -3,9 +3,9 @@ package com.crabdp.controller;
 import com.crabdp.common.Result;
 import com.crabdp.entity.Shop;
 import com.crabdp.service.ShopService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-import lombok.extern.slf4j.Slf4j;
 
 import java.util.List;
 
@@ -39,7 +39,7 @@ public class ShopController {
      * @return 商铺id
      */
     @PostMapping
-    public Result<Long> saveShop(@RequestBody Shop shop) {
+    public Result<Long> saveShop(@RequestBody Shop shop) throws InterruptedException {
         shopService.saveShop(shop);
         return Result.ok(shop.getId());
     }
@@ -55,6 +55,14 @@ public class ShopController {
         return Result.ok();
     }
 
+    /**
+     * 根据商铺类型分页查询商铺信息
+     * @param typeId
+     * @param current
+     * @param x
+     * @param y
+     * @return
+     */
     @GetMapping("/of/type")
     public Result<List<Shop>> queryShopByType(
             @RequestParam("typeId") Long typeId,

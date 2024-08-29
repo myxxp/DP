@@ -4,7 +4,6 @@ import cn.hutool.core.util.BooleanUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.json.JSONObject;
 import cn.hutool.json.JSONUtil;
-import com.crabdp.common.PageResult;
 import com.crabdp.entity.Shop;
 import com.crabdp.mapper.ShopMapper;
 import com.crabdp.service.ShopService;
@@ -29,7 +28,6 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
-import static cn.hutool.db.sql.SqlExecutor.query;
 import static com.crabdp.utils.RedisConstants.*;
 
 @Service
@@ -193,8 +191,8 @@ public class ShopServicelmpl implements ShopService {
     }
 
     @Override
-    public void saveShop(Shop shop) {
-        shopMapper.saveShop(shop);
+    public void saveShop(Shop shop) throws InterruptedException {
+       saveShop2Redis(shop.getId(), CACHE_SHOP_TTL);
     }
 
     public void update(Shop shop) {
@@ -227,51 +225,39 @@ public class ShopServicelmpl implements ShopService {
 
     @Override
     public List<Shop> queryByTypeAndLocation(Long typeId, Integer current, Double x, Double y) {
-//        // Redis key for the geo data
-//        String key = "SHOP_GEO_KEY_" + typeId;
-//
-//        // Page parameters
-//        int from = (current - 1) * SystemConstants.DEFAULT_PAGE_SIZE;
-//        int end = current * SystemConstants.DEFAULT_PAGE_SIZE;
-//
-//        // Execute geo search
-//        GeoResults<RedisGeoCommands.GeoLocation<String>> results = stringRedisTemplate.opsForGeo()
-//                .search(
-//                        key,
-//                        GeoReference.fromCoordinate(x, y),
-//                        new Distance(5000),
-//                        RedisGeoCommands.GeoSearchCommandArgs.newGeoSearchArgs().includeDistance().limit(end)
-//                );
-//
-//        if (results == null || results.getContent().isEmpty()) {
-//            return Collections.emptyList();
-//        }
-//
-//        List<GeoResult<RedisGeoCommands.GeoLocation<String>>> list = results.getContent();
-//        if (list.size() <= from) {
-//            return Collections.emptyList();
-//        }
-//
-//        List<Long> ids = new ArrayList<>(list.size());
-//        Map<String, Distance> distanceMap = new HashMap<>(list.size());
-//        list.stream().skip(from).forEach(result -> {
-//            String shopIdStr = result.getContent().getName();
-//            ids.add(Long.valueOf(shopIdStr));
-//            Distance distance = result.getDistance();
-//            distanceMap.put(shopIdStr, distance);
-//        });
-//
-//        // Fetch shop details from the database
-//
-//        List<Shop> shops = shopMapper.findByIds(ids);
-//        for (Shop shop : shops) {
-//            shop.setDistance(distanceMap.get(shop.getId().toString()).getValue());
-//        }
-//
-//        return shops;
-        PageHelper.startPage(current, SystemConstants.DEFAULT_PAGE_SIZE);
-        Page<Shop> page = shopMapper.queryByTypeAndLocation(typeId, x, y);
-        return page.getResult();
+        int from = (current - 1) * SystemConstants.DEFAULT_PAGE_SIZE;
+        int end = current * SystemConstants.DEFAULT_PAGE_SIZE;
+
+        String key = SHOP_GEO_KEY + typeId;
+        GeoResults<RedisGeoCommands.GeoLocation<String>> results = stringRedisTemplate.opsForGeo()
+                .search(
+                        key,
+                        GeoReference.fromCoordinate(x, y),
+                        new Distance(5000),
+                        RedisGeoCommands.GeoSearchCommandArgs.newGeoSearchArgs().includeDistance().limit(end)
+                );
+        if (results == null) {
+            return Collections.emptyList();
+        }
+        List<GeoResult<RedisGeoCommands.GeoLocation<String>>> list = results.getContent();
+
+        //处理Result数据小于业内数据情况,不足以跳过时,返回空集合
+        if (list.size() <= from) {
+            return Collections.emptyList();
+        }
+        List<Long> ids = new ArrayList<>(list.size());
+        Map<String, Distance> distanceMap = new HashMap<>(list.size());
+        list.stream().skip(from).forEach(result -> {
+            String shopIdStr = result.getContent().getName();
+            ids.add(Long.valueOf(shopIdStr));
+            Distance distance = result.getDistance();
+            distanceMap.put(shopIdStr, distance);
+        });
+        List<Shop> shops = shopMapper.queryByTypeAndLocation(ids);
+        for (Shop shop : shops) {
+            shop.setDistance(distanceMap.get(shop.getId().toString()).getValue());
+        }
+        return shops;
     }
 
     public List<Shop> queryByName(String name, Integer current) {
@@ -310,5 +296,9 @@ public class ShopServicelmpl implements ShopService {
         //3.存入redis
         stringRedisTemplate.opsForValue().set(CACHE_SHOP_KEY  + id, JSONUtil.toJsonStr(redisData));
 
+    }
+
+    public List<Shop> list() {
+        return shopMapper.list();
     }
 }

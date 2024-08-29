@@ -80,17 +80,16 @@
     </select>
     <select id="queryByTypeAndLocation" resultType="com.crabdp.entity.Shop">
         SELECT * FROM tb_shop
-        <where>
-            <if test="typeId != null">
-                AND type_id = #{typeId}
-            </if>
-<!--            <if test="x != null">-->
-<!--                AND x = #{x}-->
-<!--            </if>-->
-<!--            <if test="y != null">-->
-<!--                AND y = #{y}-->
-<!--            </if>-->
-        </where>
+        where tb_shop.id in <foreach item="id" index="index" collection="list" open="(" separator="," close=")">
+        #{id}
+    </foreach>
+        ORDER BY FIELD(id,
+        <foreach item="id" index="index" collection="list" separator=",">
+            #{id}
+        </foreach>)
+    </select>
+    <select id="list" resultType="com.crabdp.entity.Shop">
+        SELECT * FROM tb_shop
         ORDER BY create_time DESC
     </select>
 

@@ -31,4 +31,6 @@ public interface UserMapper {
     User selectById(Long userId);
 
     List<User> list();
+
+    List<User> selectByIds(List<Long> ids);
 }

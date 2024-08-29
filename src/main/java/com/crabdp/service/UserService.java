@@ -4,6 +4,7 @@ import com.crabdp.dto.LoginFormDTO;
 import com.crabdp.dto.UserDTO;
 import com.crabdp.entity.User;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import java.util.List;
 
@@ -23,4 +24,6 @@ public interface UserService{
     Integer  signCount();
 
     List<User> list();
+
+    void logout(HttpServletRequest request);
 }

@@ -1,6 +1,5 @@
 package com.crabdp.service;
 
-import com.crabdp.common.PageResult;
 import com.crabdp.entity.Shop;
 
 import java.util.List;
@@ -10,7 +9,7 @@ public interface ShopService {
 
     Shop queryById(Long id);
 
-    void saveShop(Shop shop);
+    void saveShop(Shop shop) throws InterruptedException;
 
     void update(Shop shop);
 
@@ -20,4 +19,6 @@ public interface ShopService {
 
 
     List<Shop> queryByName(String name, Integer current);
+
+    List<Shop> list();
 }
